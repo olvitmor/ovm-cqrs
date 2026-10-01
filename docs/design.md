@@ -20,19 +20,21 @@ All three packages share one version number (lockstep).
 | `Ovm.Cqrs.EfCore`  | `Ovm.Cqrs`, `Microsoft.EntityFrameworkCore.Relational` 10.0.0  | Transaction pipeline step |
 
 Namespaces are flat: each package has a single namespace equal to its package ID.
+Inside a package, folders organise the source (`Commands/Abstracts`, `Queries/Abstracts`, `Exceptions`)
+without changing the namespace. `dotnet_style_namespace_match_folder` is turned off for this reason.
 
 ## Core API
 
 ### Messages and results
 
 - `ICommand<TResult>`, `IQuery<TResult>`. **`TResult` is unconstrained**: any type can be a result.
-- `ICommand` (a command with no result) is `ICommand<Unit>`. `Unit` is a struct shipped in the core.
+- Every command has a result type; there is no void command and no `Unit`. A command with nothing to
+  return uses a result type the user defines (e.g. `public sealed record EmptyCommandResult;`).
 - `IHasSuccess { bool IsSuccess { get; } }` is **optional**. The EfCore and Logging packages read it.
 
 ### Handlers
 
-- `ICommandHandler<TCommand, TResult>`, `ICommandHandler<TCommand>` (returns `Task`), and
-  `IQueryHandler<TQuery, TResult>`.
+- `ICommandHandler<TCommand, TResult>` and `IQueryHandler<TQuery, TResult>`.
 - `HandleAsync(message, CancellationToken)`. The `CancellationToken` is **required**.
 - The core ships no base handler classes.
 

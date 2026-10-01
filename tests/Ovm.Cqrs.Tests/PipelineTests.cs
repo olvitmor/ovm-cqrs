@@ -41,14 +41,16 @@ public class PipelineTests
             Task.FromResult("cached");
     }
 
-    public sealed record SetValue : ICommand;
+    public sealed record EmptyCommandResult;
 
-    public sealed class SetValueHandler(Trace trace) : ICommandHandler<SetValue>
+    public sealed record SetValue : ICommand<EmptyCommandResult>;
+
+    public sealed class SetValueHandler(Trace trace) : ICommandHandler<SetValue, EmptyCommandResult>
     {
-        public Task HandleAsync(SetValue command, CancellationToken cancellationToken)
+        public Task<EmptyCommandResult> HandleAsync(SetValue command, CancellationToken cancellationToken)
         {
             trace.Add("command-handler");
-            return Task.CompletedTask;
+            return Task.FromResult(new EmptyCommandResult());
         }
     }
 

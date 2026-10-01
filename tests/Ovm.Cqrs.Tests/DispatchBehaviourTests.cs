@@ -12,11 +12,11 @@ public class DispatchBehaviourTests
             Task.FromResult(cancellationToken);
     }
 
-    public sealed record Explode(Exception Exception) : ICommand;
+    public sealed record Explode(Exception Exception) : ICommand<int>;
 
-    public sealed class ExplodeHandler : ICommandHandler<Explode>
+    public sealed class ExplodeHandler : ICommandHandler<Explode, int>
     {
-        public Task HandleAsync(Explode command, CancellationToken cancellationToken) => throw command.Exception;
+        public Task<int> HandleAsync(Explode command, CancellationToken cancellationToken) => throw command.Exception;
     }
 
     [Fact]
