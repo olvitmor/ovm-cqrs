@@ -1,0 +1,46 @@
+name: release
+
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: nuget              # must match the Trusted Publishing policy (if set)
+    permissions:
+      id-token: write               # ← required for Trusted Publishing (OIDC)
+      contents: write               # ← required to create the GitHub Release
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+
+      - run: ./build.sh ./artifacts
+
+      - name: NuGet login (OIDC → short-lived API key)
+        id: nuget
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Push to nuget.org
+        run: >
+          dotnet nuget push "artifacts/*.nupkg"
+          --api-key "${{ steps.nuget.outputs.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
+        # matching .snupkg files are pushed automatically alongside each .nupkg
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release create "$GITHUB_REF_NAME"
+          --generate-notes
+          ${{ contains(github.ref_name, '-') && '--prerelease' || '' }}
+          artifacts/*.nupkg artifacts/*.snupkg
