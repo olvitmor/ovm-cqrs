@@ -27,7 +27,7 @@ without changing the namespace. `dotnet_style_namespace_match_folder` is turned 
 - `ICommand<TResult>`, `IQuery<TResult>`. **`TResult` is unconstrained**: any type can be a result.
 - Every command has a result type; there is no void command and no `Unit`. A command with nothing to
   return uses a result type the user defines (e.g. `public sealed record EmptyCommandResult;`).
-- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. Users' own pipeline steps can read it (e.g. to roll back a transaction).
+- The core defines no result contract (no `IsSuccess` interface). Users who need one define it and read it in their own pipeline steps.
 
 ### Handlers
 
