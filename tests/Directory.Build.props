@@ -3,13 +3,17 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <IsTestProject>true</IsTestProject>
     <!-- Test method names use underscores (Method_Condition_Expectation). -->
     <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!-- Only *.Tests projects are test runners; other projects here (e.g. fixtures) are plain libraries. -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Tests'))">
     <PackageReference Include="xunit.v3" />
     <Using Include="Xunit" />
   </ItemGroup>

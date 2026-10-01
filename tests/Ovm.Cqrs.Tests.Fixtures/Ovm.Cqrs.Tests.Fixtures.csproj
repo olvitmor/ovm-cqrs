@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Handlers for assembly-scanning tests. Kept separate so scanning never picks up the main test assembly's handlers. -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ovm.Cqrs\Ovm.Cqrs.csproj" />
+  </ItemGroup>
+
+</Project>

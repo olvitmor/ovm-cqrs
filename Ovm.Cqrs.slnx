@@ -10,6 +10,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/Ovm.Cqrs.EfCore.Tests/Ovm.Cqrs.EfCore.Tests.csproj" />
     <Project Path="tests/Ovm.Cqrs.Logging.Tests/Ovm.Cqrs.Logging.Tests.csproj" />
+    <Project Path="tests/Ovm.Cqrs.Tests.Fixtures/Ovm.Cqrs.Tests.Fixtures.csproj" />
     <Project Path="tests/Ovm.Cqrs.Tests/Ovm.Cqrs.Tests.csproj" />
   </Folder>
 </Solution>

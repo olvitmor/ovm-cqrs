@@ -10,6 +10,8 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <EnablePackageValidation>true</EnablePackageValidation>
     <IsAotCompatible>true</IsAotCompatible>
+    <!-- CA1716: `next` is the idiomatic pipeline parameter name; the rule only matters for VB.NET consumers. -->
+    <NoWarn>$(NoWarn);CA1716</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

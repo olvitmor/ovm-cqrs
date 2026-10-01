@@ -49,13 +49,18 @@ queries.ProcessQueryAsync(query, ct);
 ```
 
 - Every method returns `Task<TResult>`. `CancellationToken cancellationToken = default` on processors.
+- The inferred overloads are marked `[RequiresDynamicCode]` (they use `MakeGenericType`). Native AOT apps
+  get a warning there and should use the explicit overloads.
 - Exceptions propagate unwrapped. The core's only own exceptions are `HandlerNotFoundException` and
   `DuplicateHandlerException`; both derive from `InvalidOperationException`.
 
 ### Pipeline
 
-- `ICommandPipelineStep<TCommand, TResult>` and `IQueryPipelineStep<TQuery, TResult>`, each with a
-  `next(message, ct)` delegate.
+- `ICommandPipelineStep<TCommand, TResult>` and `IQueryPipelineStep<TQuery, TResult>`, each receiving a
+  `next(message, ct)` delegate of type `CommandPipelineNext<,>` / `QueryPipelineNext<,>`.
+- A step is either an **open generic** (it runs for every command or query) or a **closed type** (it runs
+  only for the messages it implements the step interface for).
+- Steps are registered as Scoped.
 - Steps run in **registration order, outermost first**.
 - The core ships **no** steps.
 
@@ -70,7 +75,11 @@ services.AddCqrs(cqrs => cqrs
     .AddQueryPipelineStep(typeof(CachingStep<,>)));
 ```
 
-- Handlers are **Scoped** by default; the lifetime can be overridden per `AddHandlersFrom…` call.
+- `AddHandler<THandler>(lifetime)` registers one handler explicitly. It needs no scanning, so it is
+  trimming/AOT-safe.
+- `AddHandlersFromAssembly(asm)` / `AddHandlersFromAssemblyContaining<T>()` register every concrete,
+  non-generic handler in an assembly. They are marked `[RequiresUnreferencedCode]`.
+- Handlers are **Scoped** by default; the lifetime can be overridden on each `AddHandler…` call.
 - If two handlers handle the same message, `AddCqrs` throws `DuplicateHandlerException` at startup.
 - A missing handler throws `HandlerNotFoundException` at dispatch, with a hint about registration.
 - There is no startup check that every message has a handler in v0.1.
