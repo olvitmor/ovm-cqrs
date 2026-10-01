@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Ovm.Cqrs\Ovm.Cqrs.csproj" />
-    <ProjectReference Include="..\..\src\Ovm.Cqrs.EfCore\Ovm.Cqrs.EfCore.csproj" />
   </ItemGroup>
 
 </Project>

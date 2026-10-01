@@ -9,16 +9,14 @@ This file records the decisions behind v0.1. Change it when a decision changes.
 - Targets **`net10.0` only**.
 - License: MIT.
 
-## Packages
+## Package
 
-Both packages share one version number (lockstep).
+A single package, **`Ovm.Cqrs`**, depending only on `Microsoft.Extensions.DependencyInjection.Abstractions`
+(lowest compatible version, 10.0.0). Logging and EF Core transactions were planned as add-on packages and
+dropped: users write them as their own pipeline steps, and the README shows examples. If add-on packages
+come back, they share the core's version number (lockstep).
 
-| Package            | Depends on (lowest compatible version)                         | Purpose |
-|--------------------|----------------------------------------------------------------|---------|
-| `Ovm.Cqrs`         | `Microsoft.Extensions.DependencyInjection.Abstractions` 10.0.0 | Abstractions, processors, pipeline, registration |
-| `Ovm.Cqrs.EfCore`  | `Ovm.Cqrs`, `Microsoft.EntityFrameworkCore.Relational` 10.0.0  | Transaction pipeline step |
-
-Namespaces are flat: each package has a single namespace equal to its package ID.
+The namespace is flat: everything public is in `Ovm.Cqrs`.
 Inside a package, folders organise the source (`Commands/Abstracts`, `Queries/Abstracts`, `Exceptions`)
 without changing the namespace. `dotnet_style_namespace_match_folder` is turned off for this reason.
 
@@ -29,7 +27,7 @@ without changing the namespace. `dotnet_style_namespace_match_folder` is turned 
 - `ICommand<TResult>`, `IQuery<TResult>`. **`TResult` is unconstrained**: any type can be a result.
 - Every command has a result type; there is no void command and no `Unit`. A command with nothing to
   return uses a result type the user defines (e.g. `public sealed record EmptyCommandResult;`).
-- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. The EfCore package reads it.
+- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. Users' own pipeline steps can read it (e.g. to roll back a transaction).
 
 ### Handlers
 
@@ -63,7 +61,7 @@ queries.ProcessQueryAsync(query, ct);
   only for the messages it implements the step interface for).
 - Steps are registered as Scoped.
 - Steps run in **registration order, outermost first**.
-- The core ships **no** steps. Cross-cutting concerns such as logging, validation and authorization are
+- The core ships **no** steps. Cross-cutting concerns such as logging, transactions, validation and authorization are
   steps users write themselves (`ICommandPipelineStep` / `IQueryPipelineStep`); the README shows
   examples. There is no logging package.
 
@@ -72,7 +70,7 @@ queries.ProcessQueryAsync(query, ct);
 ```csharp
 services.AddCqrs(cqrs => cqrs
     .AddHandlersFromAssembly(typeof(Program).Assembly)   // or AddHandlersFromAssemblyContaining<T>()
-    .AddEfCoreTransactions<AppDbContext>()               // Ovm.Cqrs.EfCore
+    .AddCommandPipelineStep(typeof(TransactionStep<,>))
     .AddCommandPipelineStep(typeof(AuthorizationStep<,>))
     .AddQueryPipelineStep(typeof(CachingStep<,>)));
 ```
@@ -89,25 +87,13 @@ services.AddCqrs(cqrs => cqrs
 - A missing handler throws `HandlerNotFoundException` at dispatch, with a hint about registration.
 - There is no startup check that every message has a handler in v0.1.
 
-## Ovm.Cqrs.EfCore
-
-- A transaction pipeline step, registered with `AddEfCoreTransactions<TDbContext>()`.
-- Applies to **all commands**. `[NoTransaction]` on a command type opts that command out.
-- The whole unit runs inside `Database.CreateExecutionStrategy().ExecuteAsync(...)`, so retrying
-  strategies (e.g. Npgsql `EnableRetryOnFailure`) work.
-- If a transaction is already active (a nested command), the step just calls `next`; the outer
-  command owns the commit.
-- Order of operations: begin → `next` → `SaveChangesAsync` → commit → `IAfterCommitHandler<TCommand>`.
-- Rolls back on an exception, or when the result implements `IHasIsSuccessFlag` and `IsSuccess == false`.
-
 ## Engineering
 
 - Layout: `src/`, `tests/`, `samples/`, `Ovm.Cqrs.slnx`, `Directory.Build.props`,
   `Directory.Packages.props` (Central Package Management), `global.json`.
 - Public APIs require XML docs, written in English. Warnings are errors.
 - Builds are deterministic, with SourceLink, `.snupkg` symbol packages and package validation.
-- Tests: xUnit v3 with the built-in `Assert`. EfCore tests use Testcontainers PostgreSQL.
-- Core and EfCore are built test-first.
+- Tests: xUnit v3 with the built-in `Assert`, on Microsoft.Testing.Platform. Built test-first.
 
 ## Versioning and release
 

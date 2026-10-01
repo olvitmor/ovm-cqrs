@@ -1,6 +1,6 @@
 # CI/CD guide: GitHub Actions + Azure DevOps → NuGet
 
-How `Ovm.Cqrs` and `Ovm.Cqrs.EfCore` get built, tested and published.
+How `Ovm.Cqrs` gets built, tested and published.
 
 ## The big picture
 
@@ -155,11 +155,12 @@ CONFIG=Release
 dotnet restore
 dotnet build --configuration "$CONFIG" --no-restore -warnaserror
 dotnet test  --configuration "$CONFIG" --no-build
-dotnet pack  --configuration "$CONFIG" --no-build --output "$ARTIFACTS"
+for project in src/*/*.csproj; do
+  dotnet pack "$project" --configuration "$CONFIG" --no-build --output "$ARTIFACTS"
+done
 ```
 
-`chmod +x build.sh`. Locally, `./build.sh` does exactly what CI does. That needs Docker running,
-because the EfCore tests use Testcontainers.
+`chmod +x build.sh`. Locally, `./build.sh` does exactly what CI does.
 
 ### 2.2 `Directory.Build.props`: CI-relevant bits
 
@@ -191,7 +192,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest          # has Docker → Testcontainers works
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
         with:
@@ -271,7 +272,7 @@ trigger:
 pr: none                            # PRs are validated by GitHub Actions ci.yml
 
 pool:
-  vmImage: ubuntu-latest            # has Docker → Testcontainers works
+  vmImage: ubuntu-latest
 
 variables:
   feedUrl: https://pkgs.dev.azure.com/olvitmor/ovm-cqrs/_packaging/ovm/nuget/v3/index.json
@@ -371,7 +372,6 @@ Then reference a prerelease explicitly, for example `dotnet add package Ovm.Cqrs
 | `NuGet/login` fails: no matching policy | Owner/repo/workflow file/environment differ from the policy | Fix the policy on nuget.org, or the `environment:` in `release.yml` |
 | `NuGet/login` fails: missing OIDC token | `id-token: write` missing | Add it under the job's `permissions` |
 | nuget.org push: `403` for a new package ID | Trusted Publishing can't create the ID | One-time classic key (see 1.2 note) |
-| Testcontainers: `Docker is not running` | Self-hosted agent or local machine without Docker | Use `ubuntu-latest` hosted agents / start Docker Desktop |
 
 > Action versions (`@v5`, `@v4`, `@v1`) were current when this guide was written; check the
 > actions' release pages and bump the major versions when you set this up.
