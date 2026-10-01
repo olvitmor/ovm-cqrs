@@ -30,7 +30,7 @@ without changing the namespace. `dotnet_style_namespace_match_folder` is turned 
 - `ICommand<TResult>`, `IQuery<TResult>`. **`TResult` is unconstrained**: any type can be a result.
 - Every command has a result type; there is no void command and no `Unit`. A command with nothing to
   return uses a result type the user defines (e.g. `public sealed record EmptyCommandResult;`).
-- `IHasSuccess { bool IsSuccess { get; } }` is **optional**. The EfCore and Logging packages read it.
+- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. The EfCore and Logging packages read it.
 
 ### Handlers
 
@@ -92,7 +92,7 @@ services.AddCqrs(cqrs => cqrs
 |--------------------------------|---------------|
 | Start                          | Debug         |
 | Success (+ elapsed time)       | Debug         |
-| `IHasSuccess.IsSuccess == false` | Information |
+| `IHasIsSuccessFlag.IsSuccess == false` | Information |
 | Exception (+ exception object) | Error         |
 | `OperationCanceledException`   | Debug         |
 
@@ -112,7 +112,7 @@ services.AddCqrs(cqrs => cqrs
 - If a transaction is already active (a nested command), the step just calls `next`; the outer
   command owns the commit.
 - Order of operations: begin → `next` → `SaveChangesAsync` → commit → `IAfterCommitHandler<TCommand>`.
-- Rolls back on an exception, or when the result implements `IHasSuccess` and `IsSuccess == false`.
+- Rolls back on an exception, or when the result implements `IHasIsSuccessFlag` and `IsSuccess == false`.
 
 ## Engineering
 

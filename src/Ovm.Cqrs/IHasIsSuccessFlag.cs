@@ -5,7 +5,7 @@ namespace Ovm.Cqrs;
 /// Pipeline steps can inspect it; for example, the EF Core transaction step rolls back when
 /// <see cref="IsSuccess"/> is <see langword="false"/>.
 /// </summary>
-public interface IHasSuccess
+public interface IHasIsSuccessFlag
 {
     /// <summary>
     /// Whether the operation succeeded.
