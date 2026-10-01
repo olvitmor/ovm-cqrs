@@ -1,0 +1,3 @@
+# Folders organise the source; every public type deliberately lives in the single `Ovm.Cqrs` namespace.
+[*.cs]
+dotnet_style_namespace_match_folder = false

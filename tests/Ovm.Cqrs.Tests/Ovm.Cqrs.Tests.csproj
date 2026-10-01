@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Ovm.Cqrs\Ovm.Cqrs.csproj" />
+    <ProjectReference Include="..\Ovm.Cqrs.Tests.Fixtures\Ovm.Cqrs.Tests.Fixtures.csproj" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+  </ItemGroup>
+
+</Project>

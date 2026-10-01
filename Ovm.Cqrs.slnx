@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/samples/">
+    <Project Path="samples/Ovm.Cqrs.Samples.WebApi/Ovm.Cqrs.Samples.WebApi.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Ovm.Cqrs/Ovm.Cqrs.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ovm.Cqrs.Tests.Fixtures/Ovm.Cqrs.Tests.Fixtures.csproj" />
+    <Project Path="tests/Ovm.Cqrs.Tests/Ovm.Cqrs.Tests.csproj" />
+  </Folder>
+</Solution>
