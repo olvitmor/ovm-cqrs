@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Ovm.Cqrs;
 
@@ -18,8 +19,8 @@ public static class CqrsServiceCollectionExtensions
         ArgumentNullException.ThrowIfNull(services);
         ArgumentNullException.ThrowIfNull(configure);
 
-        services.AddScoped<ICommandProcessor, CommandProcessor>();
-        services.AddScoped<IQueryProcessor, QueryProcessor>();
+        services.TryAddScoped<ICommandProcessor, CommandProcessor>();
+        services.TryAddScoped<IQueryProcessor, QueryProcessor>();
         configure(new CqrsBuilder(services));
         return services;
     }

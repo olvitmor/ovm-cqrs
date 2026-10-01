@@ -82,7 +82,10 @@ services.AddCqrs(cqrs => cqrs
 - `AddHandlersFromAssembly(asm)` / `AddHandlersFromAssemblyContaining<T>()` register every concrete,
   non-generic handler in an assembly. They are marked `[RequiresUnreferencedCode]`.
 - Handlers are **Scoped** by default; the lifetime can be overridden on each `AddHandler…` call.
-- If two handlers handle the same message, `AddCqrs` throws `DuplicateHandlerException` at startup.
+- **Any** duplicate handler registration throws `DuplicateHandlerException` immediately: two different
+  handlers for one message, the same handler registered twice, a duplicate coming from a second `AddCqrs`
+  call, or a handler that was already registered manually in the `IServiceCollection`.
+- Calling `AddCqrs` more than once is allowed; the processors are registered only once (`TryAdd`).
 - A missing handler throws `HandlerNotFoundException` at dispatch, with a hint about registration.
 - There is no startup check that every message has a handler in v0.1.
 

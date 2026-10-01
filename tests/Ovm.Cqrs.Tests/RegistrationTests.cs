@@ -32,6 +32,39 @@ public class RegistrationTests
     }
 
     [Fact]
+    public void SameHandlerRegisteredTwice_ThrowsDuplicateHandlerException()
+    {
+        var services = new ServiceCollection();
+
+        var ex = Assert.Throws<DuplicateHandlerException>(() =>
+            services.AddCqrs(cqrs => cqrs.AddHandler<PingHandlerA>().AddHandler<PingHandlerA>()));
+
+        Assert.Equal(typeof(Ping), ex.MessageType);
+    }
+
+    [Fact]
+    public void DuplicateAcrossSeparateAddCqrsCalls_ThrowsDuplicateHandlerException()
+    {
+        var services = new ServiceCollection().AddCqrs(cqrs => cqrs.AddHandler<PingHandlerA>());
+
+        var ex = Assert.Throws<DuplicateHandlerException>(() =>
+            services.AddCqrs(cqrs => cqrs.AddHandler<PingHandlerB>()));
+
+        Assert.Equal(typeof(Ping), ex.MessageType);
+    }
+
+    [Fact]
+    public void DuplicateOfManuallyRegisteredHandler_ThrowsDuplicateHandlerException()
+    {
+        var services = new ServiceCollection().AddScoped<IQueryHandler<Ping, string>, PingHandlerA>();
+
+        var ex = Assert.Throws<DuplicateHandlerException>(() =>
+            services.AddCqrs(cqrs => cqrs.AddHandler<PingHandlerB>()));
+
+        Assert.Equal(typeof(Ping), ex.MessageType);
+    }
+
+    [Fact]
     public async Task MissingHandler_ThrowsHandlerNotFoundException_NamingTheMessage()
     {
         await using var provider = new ServiceCollection()

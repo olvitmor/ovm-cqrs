@@ -18,8 +18,6 @@ public sealed class CqrsBuilder
     private const string ScanningMessage =
         "Assembly scanning finds handlers via reflection, which trimming can break. Use AddHandler<THandler>() in trimmed or Native AOT apps.";
 
-    private readonly Dictionary<Type, Type> _handlers = [];
-
     internal CqrsBuilder(IServiceCollection services) => Services = services;
 
     /// <summary>
@@ -73,10 +71,14 @@ public sealed class CqrsBuilder
         foreach (var serviceType in handlerType.GetInterfaces()
                      .Where(i => i.IsGenericType && HandlerInterfaces.Contains(i.GetGenericTypeDefinition())))
         {
-            if (_handlers.TryGetValue(serviceType, out var existing))
-                throw new DuplicateHandlerException(serviceType.GetGenericArguments()[0], existing, handlerType);
+            // Checked against the whole collection, so duplicates are caught across AddCqrs calls and manual registrations.
+            var existing = Services.FirstOrDefault(d => !d.IsKeyedService && d.ServiceType == serviceType);
+            if (existing is not null)
+                throw new DuplicateHandlerException(
+                    serviceType.GetGenericArguments()[0],
+                    existing.ImplementationType ?? existing.ImplementationInstance?.GetType() ?? serviceType,
+                    handlerType);
 
-            _handlers.Add(serviceType, handlerType);
             Services.Add(new ServiceDescriptor(serviceType, handlerType, lifetime));
         }
 
