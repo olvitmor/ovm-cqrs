@@ -1,0 +1,22 @@
+@host = http://localhost:5078
+
+### Create a todo
+POST {{host}}/todos
+Content-Type: application/json
+
+{ "title": "Write the README" }
+
+### Validation failure (empty title) -> 400
+POST {{host}}/todos
+Content-Type: application/json
+
+{ "title": "" }
+
+### List todos
+GET {{host}}/todos
+
+### Get one todo (paste an id from the create response)
+GET {{host}}/todos/00000000-0000-0000-0000-000000000000
+
+### Complete a todo
+POST {{host}}/todos/00000000-0000-0000-0000-000000000000/complete
