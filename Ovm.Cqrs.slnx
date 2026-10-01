@@ -4,12 +4,10 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/Ovm.Cqrs.EfCore/Ovm.Cqrs.EfCore.csproj" />
-    <Project Path="src/Ovm.Cqrs.Logging/Ovm.Cqrs.Logging.csproj" />
     <Project Path="src/Ovm.Cqrs/Ovm.Cqrs.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Ovm.Cqrs.EfCore.Tests/Ovm.Cqrs.EfCore.Tests.csproj" />
-    <Project Path="tests/Ovm.Cqrs.Logging.Tests/Ovm.Cqrs.Logging.Tests.csproj" />
     <Project Path="tests/Ovm.Cqrs.Tests.Fixtures/Ovm.Cqrs.Tests.Fixtures.csproj" />
     <Project Path="tests/Ovm.Cqrs.Tests/Ovm.Cqrs.Tests.csproj" />
   </Folder>

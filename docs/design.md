@@ -11,12 +11,11 @@ This file records the decisions behind v0.1. Change it when a decision changes.
 
 ## Packages
 
-All three packages share one version number (lockstep).
+Both packages share one version number (lockstep).
 
 | Package            | Depends on (lowest compatible version)                         | Purpose |
 |--------------------|----------------------------------------------------------------|---------|
 | `Ovm.Cqrs`         | `Microsoft.Extensions.DependencyInjection.Abstractions` 10.0.0 | Abstractions, processors, pipeline, registration |
-| `Ovm.Cqrs.Logging` | `Ovm.Cqrs`, `Microsoft.Extensions.Logging.Abstractions` 10.0.0 | Logging pipeline step |
 | `Ovm.Cqrs.EfCore`  | `Ovm.Cqrs`, `Microsoft.EntityFrameworkCore.Relational` 10.0.0  | Transaction pipeline step |
 
 Namespaces are flat: each package has a single namespace equal to its package ID.
@@ -30,7 +29,7 @@ without changing the namespace. `dotnet_style_namespace_match_folder` is turned 
 - `ICommand<TResult>`, `IQuery<TResult>`. **`TResult` is unconstrained**: any type can be a result.
 - Every command has a result type; there is no void command and no `Unit`. A command with nothing to
   return uses a result type the user defines (e.g. `public sealed record EmptyCommandResult;`).
-- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. The EfCore and Logging packages read it.
+- `IHasIsSuccessFlag { bool IsSuccess { get; } }` is **optional**. The EfCore package reads it.
 
 ### Handlers
 
@@ -64,14 +63,15 @@ queries.ProcessQueryAsync(query, ct);
   only for the messages it implements the step interface for).
 - Steps are registered as Scoped.
 - Steps run in **registration order, outermost first**.
-- The core ships **no** steps.
+- The core ships **no** steps. Cross-cutting concerns such as logging, validation and authorization are
+  steps users write themselves (`ICommandPipelineStep` / `IQueryPipelineStep`); the README shows
+  examples. There is no logging package.
 
 ### Registration
 
 ```csharp
 services.AddCqrs(cqrs => cqrs
     .AddHandlersFromAssembly(typeof(Program).Assembly)   // or AddHandlersFromAssemblyContaining<T>()
-    .AddLogging()                                        // Ovm.Cqrs.Logging
     .AddEfCoreTransactions<AppDbContext>()               // Ovm.Cqrs.EfCore
     .AddCommandPipelineStep(typeof(AuthorizationStep<,>))
     .AddQueryPipelineStep(typeof(CachingStep<,>)));
@@ -88,23 +88,6 @@ services.AddCqrs(cqrs => cqrs
 - Calling `AddCqrs` more than once is allowed; the processors are registered only once (`TryAdd`).
 - A missing handler throws `HandlerNotFoundException` at dispatch, with a hint about registration.
 - There is no startup check that every message has a handler in v0.1.
-
-## Ovm.Cqrs.Logging
-
-| Event                          | Level         |
-|--------------------------------|---------------|
-| Start                          | Debug         |
-| Success (+ elapsed time)       | Debug         |
-| `IHasIsSuccessFlag.IsSuccess == false` | Information |
-| Exception (+ exception object) | Error         |
-| `OperationCanceledException`   | Debug         |
-
-- Uses `[LoggerMessage]` source generation. The logger categories are `Ovm.Cqrs.Commands` and
-  `Ovm.Cqrs.Queries`.
-- Opens a logging scope containing the message name.
-- `IncludePayloads` (default `false`) logs `{@Command}` / `{@Result}` when turned on.
-- `LogExceptions` (default `true`) can be turned off to avoid double logging. The exception is
-  always rethrown.
 
 ## Ovm.Cqrs.EfCore
 
@@ -124,7 +107,7 @@ services.AddCqrs(cqrs => cqrs
 - Public APIs require XML docs, written in English. Warnings are errors.
 - Builds are deterministic, with SourceLink, `.snupkg` symbol packages and package validation.
 - Tests: xUnit v3 with the built-in `Assert`. EfCore tests use Testcontainers PostgreSQL.
-- Core, Logging and EfCore are built test-first.
+- Core and EfCore are built test-first.
 
 ## Versioning and release
 

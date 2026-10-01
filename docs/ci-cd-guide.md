@@ -1,6 +1,6 @@
 # CI/CD guide: GitHub Actions + Azure DevOps → NuGet
 
-How `Ovm.Cqrs`, `Ovm.Cqrs.Logging` and `Ovm.Cqrs.EfCore` get built, tested and published.
+How `Ovm.Cqrs` and `Ovm.Cqrs.EfCore` get built, tested and published.
 
 ## The big picture
 
