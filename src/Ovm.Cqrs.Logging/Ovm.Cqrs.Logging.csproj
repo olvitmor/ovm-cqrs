@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Logging pipeline step for Ovm.Cqrs: message name, elapsed time, failures; payloads opt-in.</Description>
+    <PackageTags>$(PackageTags);logging</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Ovm.Cqrs\Ovm.Cqrs.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>
