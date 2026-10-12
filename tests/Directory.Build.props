@@ -3,6 +3,9 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 
   <PropertyGroup>
+    <!-- Tests (and their fixtures) run on every runtime the library supports. -->
+    <TargetFramework />
+    <TargetFrameworks>$(LibraryTargetFrameworks)</TargetFrameworks>
     <!-- Test method names use underscores (Method_Condition_Expectation). -->
     <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>

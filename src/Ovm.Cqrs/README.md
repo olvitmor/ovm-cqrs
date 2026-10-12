@@ -1,6 +1,6 @@
 # Ovm.Cqrs
 
-A small CQRS dispatcher for .NET 10. You get commands, queries, separate processors for each, and
+A small CQRS dispatcher for .NET 8, 9 and 10. You get commands, queries, separate processors for each, and
 pipeline steps around every handler. Its only dependency is
 `Microsoft.Extensions.DependencyInjection.Abstractions`.
 

@@ -6,7 +6,7 @@
 
   <!-- Library dependencies: lowest compatible versions, so consumers are never forced to upgrade. -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
   <!-- Build tooling -->
@@ -14,10 +14,18 @@
     <PackageVersion Include="MinVer" Version="8.0.0" />
   </ItemGroup>
 
-  <!-- Tests and samples: latest versions. -->
+  <!-- Tests, samples and benchmarks: latest versions. -->
   <ItemGroup>
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.8" />
     <PackageVersion Include="xunit.v3" Version="4.0.1" />
+  </ItemGroup>
+
+  <!-- The DI container used by tests matches each runtime, as in a real app on that runtime
+       (benchmarks and samples are net10.0 and get the last entry). -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" Condition="'$(TargetFramework)' == 'net8.0'" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.20" Condition="'$(TargetFramework)' == 'net9.0'" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" Condition="'$(TargetFramework)' == 'net10.0'" />
   </ItemGroup>
 
 </Project>
