@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/Ovm.Cqrs.svg)](https://www.nuget.org/packages/Ovm.Cqrs)
 [![CI](https://github.com/olvitmor/ovm-cqrs/actions/workflows/ci.yml/badge.svg)](https://github.com/olvitmor/ovm-cqrs/actions/workflows/ci.yml)
 
-A small CQRS dispatcher for .NET 10. You get commands, queries, separate processors for each, and
+A small CQRS dispatcher for .NET 8, 9 and 10. You get commands, queries, separate processors for each, and
 pipeline steps around every handler.
 
 - **Commands and queries are kept apart.** `ICommandProcessor` and `IQueryProcessor` are separate
@@ -274,7 +274,8 @@ The library is annotated for the trimming and AOT analyzers. In a trimmed or Nat
 
 ## Building from source
 
-Requires the .NET 10 SDK.
+Requires the .NET 10 SDK. To run the tests on every target framework, also install the .NET 8 and .NET 9
+runtimes.
 
 ```bash
 ./build.sh            # restore, build (warnings as errors), test, pack into ./artifacts

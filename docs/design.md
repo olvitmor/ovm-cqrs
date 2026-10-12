@@ -6,13 +6,17 @@ This file records the decisions behind v0.1. Change it when a decision changes.
 
 - A lightweight, general-purpose CQRS dispatcher. **Commands and queries only** in v0.1.
   Notifications/events and streaming queries are deferred (tracked as issues).
-- Targets **`net10.0` only**.
+- Targets **`net8.0`, `net9.0` and `net10.0`** (one `lib/` folder each in the package). The list is
+  `LibraryTargetFrameworks` in the root `Directory.Build.props`; the library and its tests use it, while
+  the sample and benchmarks stay on `net10.0`.
+- Tests run on each target framework, each with the matching `Microsoft.Extensions.DependencyInjection`
+  version (8.0.x / 9.0.x / 10.0.x), as in a real app on that runtime.
 - License: MIT.
 
 ## Package
 
 A single package, **`Ovm.Cqrs`**, depending only on `Microsoft.Extensions.DependencyInjection.Abstractions`
-(lowest compatible version, 10.0.0). Logging and EF Core transactions were planned as add-on packages and
+(lowest compatible version, 8.0.0, for every target framework). Logging and EF Core transactions were planned as add-on packages and
 dropped: users write them as their own pipeline steps, and the README shows examples. If add-on packages
 come back, they share the core's version number (lockstep).
 
